@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">NearbyRestaurantSearcher</string>
+    <string name="search_range_label">検索範囲：%1$dm</string>
+    <string name="message_when_cannot_fetch_location">GoogleMap上で現在位置が特定できませんでした</string>
 </resources>

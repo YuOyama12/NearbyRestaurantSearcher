@@ -9,12 +9,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.android.gms.maps.MapsInitializer
 import com.yuoyama12.nearbyrestaurantsearcher.ui.search.SearchScreen
 import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.NearbyRestaurantSearcherTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MapsInitializer.initialize(this)
+
         setContent {
             NearbyRestaurantSearcherTheme {
                 Surface(
