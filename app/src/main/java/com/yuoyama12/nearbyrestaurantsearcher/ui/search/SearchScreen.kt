@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -39,6 +40,7 @@ val latLngOfNullIsland = LatLng(0.0, 0.0)
 @Composable
 fun SearchScreen() {
     val context = LocalContext.current
+    val viewModel: SearchViewModel = hiltViewModel()
 
     var currentRadius by remember { mutableStateOf(RadiusForMap.Radius.RADIUS_1000M) }
     var currentLocation by remember { mutableStateOf(latLngOfNullIsland) }
@@ -73,6 +75,12 @@ fun SearchScreen() {
             onSliderValueChanged = { radius -> currentRadius = radius },
             onSearchClicked = {
                 loadCurrentLocation(context) { latAndLong -> currentLocation = latAndLong }
+
+                viewModel.fetchShops(
+                    currentLocation.latitude.toString(),
+                    currentLocation.longitude.toString(),
+                    currentRadius
+                )
             }
         )
 
@@ -164,6 +172,6 @@ private fun loadCurrentLocation(
         Priority.PRIORITY_HIGH_ACCURACY,
         CancellationTokenSource().token
     ).addOnSuccessListener { location ->
-            onTaskCompleted(LatLng(location.latitude, location.longitude))
+        onTaskCompleted(LatLng(location.latitude, location.longitude))
     }
 }

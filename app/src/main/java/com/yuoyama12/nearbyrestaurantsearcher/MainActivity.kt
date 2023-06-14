@@ -12,7 +12,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.android.gms.maps.MapsInitializer
 import com.yuoyama12.nearbyrestaurantsearcher.ui.search.SearchScreen
 import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.NearbyRestaurantSearcherTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
