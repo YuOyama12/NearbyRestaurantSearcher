@@ -4,8 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yuoyama12.nearbyrestaurantsearcher.BuildConfig
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
+import com.yuoyama12.nearbyrestaurantsearcher.data.Shops
 import com.yuoyama12.nearbyrestaurantsearcher.network.HotPepperService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -13,6 +17,9 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val service: HotPepperService
 ) : ViewModel() {
+    private val _shops = MutableStateFlow(Shops())
+    val shops: StateFlow<Shops> = _shops.asStateFlow()
+
     fun fetchShops(
         latitude: String,
         longitude: String,
@@ -33,6 +40,7 @@ class SearchViewModel @Inject constructor(
                 longitude = longitude,
                 rangeNum = rangeNum
             )
+            _shops.value = shops
         }
     }
 }

@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -33,6 +36,7 @@ import com.google.maps.android.compose.*
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RadiusSearcher
+import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RestaurantListItem
 
 const val PERMISSION_REQUEST_CODE = 1
 private val mapHeight = 265.dp
@@ -41,6 +45,7 @@ val latLngOfNullIsland = LatLng(0.0, 0.0)
 fun SearchScreen() {
     val context = LocalContext.current
     val viewModel: SearchViewModel = hiltViewModel()
+    val shops by viewModel.shops.collectAsState()
 
     var currentRadius by remember { mutableStateOf(RadiusForMap.Radius.RADIUS_1000M) }
     var currentLocation by remember { mutableStateOf(latLngOfNullIsland) }
@@ -138,6 +143,13 @@ fun SearchScreen() {
                         contentDescription = null
                     )
                 }
+            }
+        }
+
+        LazyColumn {
+            items(shops.list) { shop ->
+                RestaurantListItem(shop = shop)
+                Divider()
             }
         }
     }

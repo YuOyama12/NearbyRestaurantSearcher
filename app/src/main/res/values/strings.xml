@@ -2,4 +2,6 @@
     <string name="app_name">NearbyRestaurantSearcher</string>
     <string name="search_range_label">検索範囲：%1$dm</string>
     <string name="message_when_cannot_fetch_location">GoogleMap上で現在位置が特定できませんでした</string>
+    <string name="no_image_text">No Image</string>
+    <string name="list_item_budget_header">予算</string>
 </resources>

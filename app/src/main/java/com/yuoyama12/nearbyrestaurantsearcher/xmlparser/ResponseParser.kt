@@ -68,6 +68,7 @@ class ResponseParser {
                 "name" -> { shop = shop.copy(name = readText(parser)) }
                 "logo_image" -> { shop = shop.copy(logoImageUrl = readText(parser)) }
                 "address" -> { shop = shop.copy(address = readText(parser)) }
+                "access" -> { shop = shop.copy(access = readText(parser)) }
                 "lat" -> { shop = shop.copy(latitude = readText(parser)) }
                 "lng" -> { shop = shop.copy(longitude = readText(parser)) }
                 "open" -> { shop = shop.copy(open = readText(parser)) }

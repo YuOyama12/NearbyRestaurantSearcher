@@ -5,6 +5,7 @@ data class Shop(
     val id: String = "",
     val name: String = "",
     val address: String = "",
+    val access: String = "",
     val latitude: String = "",
     val longitude: String = "",
     val logoImageUrl: String = "",
