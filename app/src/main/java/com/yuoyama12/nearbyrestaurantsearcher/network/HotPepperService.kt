@@ -10,6 +10,12 @@ interface HotPepperService {
         @Query("key") key: String,
         @Query("lat") latitude: String,
         @Query("lng") longitude: String,
-        @Query("range") rangeNum: String
+        @Query("range") range: String
+    ): Shops
+
+    @GET("gourmet/v1")
+    suspend fun fetchShopById(
+        @Query("key") key: String,
+        @Query("id") shopId: String,
     ): Shops
 }

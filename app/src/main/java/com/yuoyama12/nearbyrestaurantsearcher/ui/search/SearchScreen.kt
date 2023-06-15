@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,7 +43,9 @@ const val PERMISSION_REQUEST_CODE = 1
 private val mapHeight = 265.dp
 val latLngOfNullIsland = LatLng(0.0, 0.0)
 @Composable
-fun SearchScreen() {
+fun SearchScreen(
+    onItemClicked: (shopId: String) -> Unit
+) {
     val context = LocalContext.current
     val viewModel: SearchViewModel = hiltViewModel()
     val shops by viewModel.shops.collectAsState()
@@ -148,8 +151,12 @@ fun SearchScreen() {
 
         LazyColumn {
             items(shops.list) { shop ->
-                RestaurantListItem(shop = shop)
-                Divider()
+                Column(
+                    modifier = Modifier.clickable { onItemClicked(shop.id) }
+                ) {
+                    RestaurantListItem(shop = shop)
+                    Divider()
+                }
             }
         }
     }

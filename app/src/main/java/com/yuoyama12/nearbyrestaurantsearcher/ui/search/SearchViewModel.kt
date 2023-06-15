@@ -25,20 +25,14 @@ class SearchViewModel @Inject constructor(
         longitude: String,
         radius: RadiusForMap.Radius
     ) {
-        val rangeNum = when (radius) {
-            RadiusForMap.Radius.RADIUS_300M -> "1"
-            RadiusForMap.Radius.RADIUS_500M -> "2"
-            RadiusForMap.Radius.RADIUS_1000M -> "3"
-            RadiusForMap.Radius.RADIUS_2000M -> "4"
-            RadiusForMap.Radius.RADIUS_3000M -> "5"
-        }
+        val range = RadiusForMap.getRangeForApi(radius)
 
         viewModelScope.launch {
             val shops = service.fetchShops(
                 key = BuildConfig.API_KEY,
                 latitude = latitude,
                 longitude = longitude,
-                rangeNum = rangeNum
+                range = range
             )
             _shops.value = shops
         }

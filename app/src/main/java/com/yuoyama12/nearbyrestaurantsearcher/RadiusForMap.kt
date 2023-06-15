@@ -26,5 +26,15 @@ object RadiusForMap {
             Radius.RADIUS_3000M -> 12.5f
         }
     }
+
+    fun getRangeForApi(radius: Radius): String {
+        return when (radius) {
+            Radius.RADIUS_300M -> "1"
+            Radius.RADIUS_500M -> "2"
+            Radius.RADIUS_1000M -> "3"
+            Radius.RADIUS_2000M -> "4"
+            Radius.RADIUS_3000M -> "5"
+        }
+    }
 }
 

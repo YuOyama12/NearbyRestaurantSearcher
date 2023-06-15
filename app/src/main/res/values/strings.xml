@@ -4,4 +4,5 @@
     <string name="message_when_cannot_fetch_location">GoogleMap上で現在位置が特定できませんでした</string>
     <string name="no_image_text">No Image</string>
     <string name="list_item_budget_header">予算</string>
+    <string name="detail_screen_shop_info_header">レストラン情報</string>
 </resources>
