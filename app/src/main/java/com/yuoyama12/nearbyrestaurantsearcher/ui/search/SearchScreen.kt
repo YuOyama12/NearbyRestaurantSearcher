@@ -35,6 +35,7 @@ import com.google.maps.android.compose.*
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
 import com.yuoyama12.nearbyrestaurantsearcher.composable.NoListItemImage
+import com.yuoyama12.nearbyrestaurantsearcher.composable.OnExecutingIndicator
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RadiusSearcher
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RestaurantListItem
 
@@ -48,6 +49,7 @@ fun SearchScreen(
     val context = LocalContext.current
     val viewModel: SearchViewModel = hiltViewModel()
     val shops by viewModel.shops.collectAsState()
+    val isSearching by viewModel.isSearching.collectAsState()
 
     var currentRadius by remember { mutableStateOf(RadiusForMap.Radius.RADIUS_1000M) }
     var currentLocation by remember { mutableStateOf(latLngOfNullIsland) }
@@ -195,6 +197,10 @@ fun SearchScreen(
                 }
             }
         }
+    }
+
+    if (isSearching) {
+        OnExecutingIndicator(text = stringResource(R.string.on_searching_indicator_message))
     }
 
 }

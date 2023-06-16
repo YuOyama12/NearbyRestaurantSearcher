@@ -20,6 +20,9 @@ class SearchViewModel @Inject constructor(
     private val _shops = MutableStateFlow(Shops())
     val shops: StateFlow<Shops> = _shops.asStateFlow()
 
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching: StateFlow<Boolean> = _isSearching.asStateFlow()
+
     fun fetchShops(
         latitude: String,
         longitude: String,
@@ -31,12 +34,16 @@ class SearchViewModel @Inject constructor(
         val range = RadiusForMap.getRangeForApi(radius)
 
         viewModelScope.launch {
+            _isSearching.value = true
+
             val shops = service.fetchShops(
                 key = BuildConfig.API_KEY,
                 latitude = latitude,
                 longitude = longitude,
                 range = range
             )
+
+            _isSearching.value = false
             _shops.value = shops
         }
     }
