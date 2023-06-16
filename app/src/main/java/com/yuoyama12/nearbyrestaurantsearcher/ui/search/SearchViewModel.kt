@@ -25,6 +25,9 @@ class SearchViewModel @Inject constructor(
         longitude: String,
         radius: RadiusForMap.Radius
     ) {
+        //検索の度に結果が１つ以上あるかどうかを確認したいため、hasResultをリセットする。。
+        _shops.value = _shops.value.copy(hasResult = null)
+
         val range = RadiusForMap.getRangeForApi(radius)
 
         viewModelScope.launch {

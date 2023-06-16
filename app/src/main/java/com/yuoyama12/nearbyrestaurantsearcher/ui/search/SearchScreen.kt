@@ -4,24 +4,22 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -36,6 +34,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.maps.android.compose.*
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
+import com.yuoyama12.nearbyrestaurantsearcher.composable.NoListItemImage
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RadiusSearcher
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RestaurantListItem
 
@@ -57,6 +56,8 @@ fun SearchScreen(
                 CameraPosition.fromLatLngZoom(currentLocation, RadiusForMap.getFloatOfRadius(currentRadius))
         }
 
+    val noResultMessage = stringResource(R.string.no_result_message)
+
     LaunchedEffect(Unit) {
         loadCurrentLocation(context) { latAndLong -> currentLocation = latAndLong }
     }
@@ -76,6 +77,17 @@ fun SearchScreen(
             )
 
         cameraPositionState.animate(cameraUpdateFactory)
+    }
+
+    LaunchedEffect(shops) {
+
+        if (shops.hasResult == false) {
+            Toast.makeText(
+                context,
+                noResultMessage,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     Column {
@@ -148,14 +160,38 @@ fun SearchScreen(
                 }
             }
         }
+        
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.secondary,
+                        RectangleShape
+                    )
+                    .shadow(2.dp, RectangleShape)
+            ) {
+                Text(text = stringResource(R.string.list_header))
+            }
 
-        LazyColumn {
-            items(shops.list) { shop ->
-                Column(
-                    modifier = Modifier.clickable { onItemClicked(shop.id) }
-                ) {
-                    RestaurantListItem(shop = shop)
-                    Divider()
+            if (shops.list.isEmpty()) {
+                NoListItemImage(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                )
+            } else {
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(shops.list) { shop ->
+                        Column(
+                            modifier = Modifier.clickable { onItemClicked(shop.id) }
+                        ) {
+                            RestaurantListItem(shop = shop)
+                            Divider()
+                        }
+                    }
                 }
             }
         }

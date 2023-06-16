@@ -9,7 +9,11 @@ class ResponseConverter : Converter<ResponseBody, Shops> {
 
     override fun convert(value: ResponseBody): Shops {
         val bs = value.string().byteInputStream()
-        return parser.parse(bs)
+        val shops = parser.parse(bs)
+
+        return shops.copy(
+            hasResult = (shops.returnedResultCount > 0)
+        )
     }
 
 }

@@ -3,6 +3,9 @@
     <string name="search_range_label">検索範囲：%1$dm</string>
     <string name="message_when_cannot_fetch_location">GoogleMap上で現在位置が特定できませんでした</string>
     <string name="no_image_text">No Image</string>
+    <string name="no_restaurant_text">No Restaurant</string>
+    <string name="no_result_message">レストランを見つけられませんでした。検索範囲を変更するなどして再度お試しください。</string>
+    <string name="list_header">現在地周辺のレストラン</string>
     <string name="list_item_budget_header">予算</string>
     <string name="detail_screen_shop_info_header">レストラン情報</string>
 </resources>
