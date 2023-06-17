@@ -18,12 +18,13 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
 import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.NearbyRestaurantSearcherTheme
 
 @Composable
-fun RadiusSearcher(
+fun ShopSearcherWithRadius(
     modifier: Modifier = Modifier,
     onSliderValueChanged: (radius: RadiusForMap.Radius) -> Unit,
     onSearchClicked: () -> Unit
@@ -38,7 +39,7 @@ fun RadiusSearcher(
             .padding(horizontal = 3.dp)
     ) {
         Column(
-            modifier = Modifier.weight(0.8f)
+            modifier = Modifier.weight(0.7f)
         ) {
             Text(text = stringResource(R.string.search_range_label, RadiusForMap.getRadius(float).int))
 
@@ -58,15 +59,22 @@ fun RadiusSearcher(
             onClick = { onSearchClicked() },
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .weight(0.2f)
+                .weight(0.3f)
                 .fillMaxHeight(0.9f)
                 .padding(horizontal = 2.dp),
             shape = RectangleShape
         ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null
+                )
+
+                Text(
+                    text = stringResource(R.string.search_button_text),
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 
@@ -76,7 +84,7 @@ fun RadiusSearcher(
 @Composable
 fun RadiusSearcherPreview() {
     NearbyRestaurantSearcherTheme {
-        RadiusSearcher(
+        ShopSearcherWithRadius(
             onSliderValueChanged = {  },
             onSearchClicked = {  }
         )

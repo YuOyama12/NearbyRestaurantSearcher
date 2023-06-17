@@ -10,7 +10,9 @@ interface HotPepperService {
         @Query("key") key: String,
         @Query("lat") latitude: String,
         @Query("lng") longitude: String,
-        @Query("range") range: String
+        @Query("range") range: String,
+        @Query("count") count: String,
+        @Query("start") start: String
     ): Shops
 
     @GET("gourmet/v1")

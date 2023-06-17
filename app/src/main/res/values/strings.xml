@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">NearbyRestaurantSearcher</string>
     <string name="search_range_label">検索範囲：%1$dm</string>
+    <string name="search_button_text">店舗検索</string>
     <string name="message_when_cannot_fetch_location">GoogleMap上で現在位置が特定できませんでした</string>
     <string name="no_image_text">No Image</string>
     <string name="no_restaurant_text">No Restaurant</string>
@@ -8,5 +9,6 @@
     <string name="on_searching_indicator_message">検索中</string>
     <string name="list_header">現在地周辺のレストラン</string>
     <string name="list_item_budget_header">予算</string>
+    <string name="max_page_count_header_for_pagination">of</string>
     <string name="detail_screen_shop_info_header">レストラン情報</string>
 </resources>

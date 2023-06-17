@@ -11,10 +11,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -32,12 +34,15 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.maps.android.compose.*
+import com.yuoyama12.nearbyrestaurantsearcher.Pagination
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
 import com.yuoyama12.nearbyrestaurantsearcher.composable.NoListItemImage
 import com.yuoyama12.nearbyrestaurantsearcher.composable.OnExecutingIndicator
-import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RadiusSearcher
+import com.yuoyama12.nearbyrestaurantsearcher.composable.component.PaginationBar
+import com.yuoyama12.nearbyrestaurantsearcher.composable.component.ShopSearcherWithRadius
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RestaurantListItem
+import kotlinx.coroutines.launch
 
 const val PERMISSION_REQUEST_CODE = 1
 private val mapHeight = 265.dp
@@ -57,6 +62,10 @@ fun SearchScreen(
             position =
                 CameraPosition.fromLatLngZoom(currentLocation, RadiusForMap.getFloatOfRadius(currentRadius))
         }
+
+    var currentPageNumber by rememberSaveable { mutableStateOf(Pagination.defaultPageNumber) }
+    val composableScope = rememberCoroutineScope()
+    val lazyListState = rememberLazyListState()
 
     val noResultMessage = stringResource(R.string.no_result_message)
 
@@ -82,7 +91,6 @@ fun SearchScreen(
     }
 
     LaunchedEffect(shops) {
-
         if (shops.hasResult == false) {
             Toast.makeText(
                 context,
@@ -93,15 +101,18 @@ fun SearchScreen(
     }
 
     Column {
-        RadiusSearcher (
+        ShopSearcherWithRadius (
             onSliderValueChanged = { radius -> currentRadius = radius },
             onSearchClicked = {
+                currentPageNumber = Pagination.defaultPageNumber
                 loadCurrentLocation(context) { latAndLong -> currentLocation = latAndLong }
 
-                viewModel.fetchShops(
-                    currentLocation.latitude.toString(),
-                    currentLocation.longitude.toString(),
-                    currentRadius
+                viewModel.searchShops(
+                    latitude = currentLocation.latitude.toString(),
+                    longitude = currentLocation.longitude.toString(),
+                    radius = currentRadius,
+                    fetchCount = Pagination.perPageNumber.toString(),
+                    fetchStartFrom = Pagination.getStartNumber(currentPageNumber).toString()
                 )
             }
         )
@@ -185,7 +196,10 @@ fun SearchScreen(
                         .fillMaxWidth()
                 )
             } else {
-                LazyColumn(modifier = Modifier.weight(1f)) {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    state = lazyListState
+                ) {
                     items(shops.list) { shop ->
                         Column(
                             modifier = Modifier.clickable { onItemClicked(shop.id) }
@@ -196,6 +210,25 @@ fun SearchScreen(
                     }
                 }
             }
+
+            Divider(modifier = Modifier.shadow(1.dp))
+            
+            PaginationBar(
+                enabled = (Pagination.getMaxPageCountFrom(shops) != 0),
+                currentPageNumber = currentPageNumber,
+                maxPageCount = Pagination.getMaxPageCountFrom(shops),
+                onForwardIconClicked = { currentPageNumber++ },
+                onBackIconClicked = { currentPageNumber-- },
+                onPageNumberSelected = { newPageNum -> currentPageNumber = newPageNum },
+                onPageChanged = {
+                    viewModel.searchShopsOnPaging(
+                        fetchCount = Pagination.perPageNumber.toString(),
+                        fetchStartFrom = Pagination.getStartNumber(currentPageNumber).toString()
+                    )
+
+                    composableScope.launch { lazyListState.scrollToItem(0) }
+                }
+            )
         }
     }
 
