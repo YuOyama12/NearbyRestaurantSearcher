@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -19,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yuoyama12.nearbyrestaurantsearcher.R
-import com.yuoyama12.nearbyrestaurantsearcher.composable.FilledRoundCornerShapedBox
+import com.yuoyama12.nearbyrestaurantsearcher.composable.FilledGenreBox
 import com.yuoyama12.nearbyrestaurantsearcher.composable.NetworkImage
 import com.yuoyama12.nearbyrestaurantsearcher.data.Shop
 
@@ -81,17 +80,10 @@ fun RestaurantListItem(
 
 
             Row(modifier = Modifier.fillMaxWidth()) {
-                FilledRoundCornerShapedBox(
-                    color = MaterialTheme.colorScheme.secondary,
-                    borderColor = Color.Black
-                ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 6.dp),
-                        text = shop.genre.name,
-                        color = Color.White,
-                        fontSize = subTextFontSize
-                    )
-                }
+                FilledGenreBox(
+                    genre = shop.genre.name,
+                    fontSize = subTextFontSize
+                )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),

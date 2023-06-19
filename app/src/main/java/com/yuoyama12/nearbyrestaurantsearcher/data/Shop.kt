@@ -9,7 +9,7 @@ data class Shop(
     val latitude: String = "",
     val longitude: String = "",
     val logoImageUrl: String = "",
-    val pageUrls: String = "",
+    val pageUrl: String = "",
     val photoUrls: PhotoUrls = PhotoUrls(),
     val budget: Budget = Budget(),
     val genre: Genre = Genre(),

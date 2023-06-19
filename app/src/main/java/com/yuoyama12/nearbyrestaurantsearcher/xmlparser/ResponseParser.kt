@@ -73,7 +73,7 @@ class ResponseParser {
                 "lng" -> { shop = shop.copy(longitude = readText(parser)) }
                 "open" -> { shop = shop.copy(open = readText(parser)) }
                 "close" -> { shop = shop.copy(close = readText(parser)) }
-                "urls" -> { shop = shop.copy(pageUrls = readPageUrls(parser)) }
+                "urls" -> { shop = shop.copy(pageUrl = readPageUrls(parser)) }
                 "budget" -> { shop = shop.copy(budget = readBudget(parser)) }
                 "genre" -> { shop = shop.copy(genre = readGenre(parser)) }
                 "photo" -> { shop = shop.copy(photoUrls = readPhotoUrls(parser)) }

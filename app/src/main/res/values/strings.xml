@@ -11,4 +11,10 @@
     <string name="list_item_budget_header">予算</string>
     <string name="max_page_count_header_for_pagination">of</string>
     <string name="detail_screen_shop_info_header">レストラン情報</string>
+    <string name="move_to_hot_pepper_button_text">ホットペッパーのページに移動</string>
+    <string name="detail_screen_shop_address_header">住所</string>
+    <string name="detail_screen_shop_access_header">アクセス</string>
+    <string name="detail_screen_shop_open_and_close_header">営業時間</string>
+    <string name="detail_screen_shop_open_header">OPEN</string>
+    <string name="detail_screen_shop_close_header">CLOSE</string>
 </resources>
