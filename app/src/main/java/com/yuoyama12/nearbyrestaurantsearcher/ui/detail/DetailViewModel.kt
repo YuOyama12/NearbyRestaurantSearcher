@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yuoyama12.nearbyrestaurantsearcher.BuildConfig
 import com.yuoyama12.nearbyrestaurantsearcher.DEFAULT_SHOP_ID
+import com.yuoyama12.nearbyrestaurantsearcher.HOT_PEPPER_API_KEY
 import com.yuoyama12.nearbyrestaurantsearcher.data.Shop
-import com.yuoyama12.nearbyrestaurantsearcher.network.HotPepperService
+import com.yuoyama12.nearbyrestaurantsearcher.network.gourmet.HotPepperGourmetSearchService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val service: HotPepperService
+    private val service: HotPepperGourmetSearchService
 ) : ViewModel() {
     private val _shop = MutableStateFlow(Shop())
     val shop: StateFlow<Shop> = _shop.asStateFlow()
@@ -24,10 +25,9 @@ class DetailViewModel @Inject constructor(
         if (shopId != DEFAULT_SHOP_ID) {
             viewModelScope.launch {
                 val shops = service.fetchShopById(
-                    key = BuildConfig.API_KEY,
+                    key = HOT_PEPPER_API_KEY,
                     shopId = shopId
                 )
-                //TODO: [1]にしてどのようなエラーが起きるかを見る。
                 _shop.value = shops.list[0]
             }
         } else {

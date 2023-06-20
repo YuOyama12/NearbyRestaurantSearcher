@@ -1,11 +1,11 @@
-package com.yuoyama12.nearbyrestaurantsearcher.xmlparser
+package com.yuoyama12.nearbyrestaurantsearcher.network.gourmet
 
 import android.util.Xml
 import com.yuoyama12.nearbyrestaurantsearcher.data.*
 import org.xmlpull.v1.XmlPullParser
 import java.io.ByteArrayInputStream
 
-class ResponseParser {
+class ResponseShopsParser {
     private var shops = Shops()
 
     fun parse(input: ByteArrayInputStream): Shops {
@@ -193,7 +193,6 @@ class ResponseParser {
         return budget
     }
 
-
     private fun readGenre(parser: XmlPullParser): Genre {
         var genre = Genre()
         parser.require(XmlPullParser.START_TAG, null, "genre")
@@ -213,6 +212,7 @@ class ResponseParser {
 
         return genre
     }
+
     private fun readText(parser: XmlPullParser): String {
         var result = ""
         if (parser.next() == XmlPullParser.TEXT) {

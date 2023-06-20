@@ -8,6 +8,7 @@
     <string name="no_result_message">レストランを見つけられませんでした。検索範囲を変更するなどして再度お試しください。</string>
     <string name="on_searching_indicator_message">検索中</string>
     <string name="list_header">現在地周辺のレストラン</string>
+    <string name="list_filter_button_text">検索条件設定</string>
     <string name="list_item_budget_header">予算</string>
     <string name="max_page_count_header_for_pagination">of</string>
     <string name="detail_screen_shop_info_header">レストラン情報</string>
@@ -17,4 +18,10 @@
     <string name="detail_screen_shop_open_and_close_header">営業時間</string>
     <string name="detail_screen_shop_open_header">OPEN</string>
     <string name="detail_screen_shop_close_header">CLOSE</string>
+    <string name="search_filter_dialog_title">検索条件の設定</string>
+    <string name="search_filter_dialog_reset_button">リセット</string>
+    <string name="search_filter_dialog_message_on_budget">※2つまで指定可能です</string>
+    <string name="search_filter_dialog_genre_header">ジャンル</string>
+    <string name="search_filter_dialog_positive_button">確定</string>
+    <string name="search_filter_dialog_negative_button">キャンセル</string>
 </resources>

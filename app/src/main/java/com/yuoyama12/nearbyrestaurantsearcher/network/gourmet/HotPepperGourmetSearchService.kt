@@ -1,10 +1,10 @@
-package com.yuoyama12.nearbyrestaurantsearcher.network
+package com.yuoyama12.nearbyrestaurantsearcher.network.gourmet
 
 import com.yuoyama12.nearbyrestaurantsearcher.data.Shops
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface HotPepperService {
+interface HotPepperGourmetSearchService {
     @GET("gourmet/v1")
     suspend fun fetchShops(
         @Query("key") key: String,
@@ -12,7 +12,9 @@ interface HotPepperService {
         @Query("lng") longitude: String,
         @Query("range") range: String,
         @Query("count") count: String,
-        @Query("start") start: String
+        @Query("start") start: String,
+        @Query("genre") genre: String,
+        @Query("budget") budget: String
     ): Shops
 
     @GET("gourmet/v1")

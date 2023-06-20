@@ -1,20 +1,20 @@
-package com.yuoyama12.nearbyrestaurantsearcher.xmlparser
+package com.yuoyama12.nearbyrestaurantsearcher.network.genre
 
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type
 
-class ResponseConverterFactory : Converter.Factory() {
+class ResponseGenresConverterFactory : Converter.Factory() {
     override fun responseBodyConverter(
         type: Type,
         annotations: Array<out Annotation>,
         retrofit: Retrofit
     ): Converter<ResponseBody, *> {
-        return ResponseConverter()
+        return ResponseGenresConverter()
     }
 
     companion object {
-        fun create() = ResponseConverterFactory()
+        fun create() = ResponseGenresConverterFactory()
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
@@ -42,10 +44,11 @@ import com.yuoyama12.nearbyrestaurantsearcher.composable.OnExecutingIndicator
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.PaginationBar
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.ShopSearcherWithRadius
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RestaurantListItem
+import com.yuoyama12.nearbyrestaurantsearcher.composable.component.SearchFilterDialog
 import kotlinx.coroutines.launch
 
 const val PERMISSION_REQUEST_CODE = 1
-private val mapHeight = 265.dp
+private val mapHeight = 255.dp
 val latLngOfNullIsland = LatLng(0.0, 0.0)
 @Composable
 fun SearchScreen(
@@ -56,12 +59,19 @@ fun SearchScreen(
     val shops by viewModel.shops.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
 
+    val genres by viewModel.genres.collectAsState()
+    val budgets by viewModel.budgets.collectAsState()
+
     var currentRadius by remember { mutableStateOf(RadiusForMap.Radius.RADIUS_1000M) }
     var currentLocation by remember { mutableStateOf(latLngOfNullIsland) }
     val cameraPositionState = rememberCameraPositionState {
             position =
                 CameraPosition.fromLatLngZoom(currentLocation, RadiusForMap.getFloatOfRadius(currentRadius))
         }
+
+    var openDialog by remember { mutableStateOf(false) }
+    val currentSelectedGenreList by viewModel.currentSelectedGenreList.collectAsState()
+    val currentSelectedBudgetList by viewModel.currentSelectedBudgetList.collectAsState()
 
     var currentPageNumber by rememberSaveable { mutableStateOf(Pagination.defaultPageNumber) }
     val composableScope = rememberCoroutineScope()
@@ -92,11 +102,7 @@ fun SearchScreen(
 
     LaunchedEffect(shops) {
         if (shops.hasResult == false) {
-            Toast.makeText(
-                context,
-                noResultMessage,
-                Toast.LENGTH_SHORT
-            ).show()
+            showToast(context, noResultMessage)
         }
     }
 
@@ -111,8 +117,7 @@ fun SearchScreen(
                     latitude = currentLocation.latitude.toString(),
                     longitude = currentLocation.longitude.toString(),
                     radius = currentRadius,
-                    fetchCount = Pagination.perPageNumber.toString(),
-                    fetchStartFrom = Pagination.getStartNumber(currentPageNumber).toString()
+                    fetchCount = Pagination.perPageNumber.toString()
                 )
             }
         )
@@ -186,7 +191,43 @@ fun SearchScreen(
                     )
                     .shadow(2.dp, RectangleShape)
             ) {
-                Text(text = stringResource(R.string.list_header))
+                Row(
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val filterButtonColors =
+                        if (currentSelectedGenreList.isNotEmpty()
+                            || currentSelectedBudgetList.isNotEmpty()) {
+                            ButtonDefaults.textButtonColors(
+                                containerColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.25f),
+                            )
+                        } else {
+                            ButtonDefaults.textButtonColors()
+                        }
+
+                    Text(
+                        text = stringResource(R.string.list_header),
+                        fontSize = 16.sp
+                    )
+
+                    Box(modifier = Modifier.weight(1f))
+
+                    TextButton(
+                        modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.primary),
+                        onClick =  { openDialog = true },
+                        shape = RectangleShape,
+                        colors = filterButtonColors
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = stringResource(R.string.list_filter_button_text))
+
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
             }
 
             if (shops.list.isEmpty()) {
@@ -232,10 +273,31 @@ fun SearchScreen(
         }
     }
 
+    if (openDialog) {
+        SearchFilterDialog(
+            defaultSelectedGenreList = currentSelectedGenreList,
+            defaultSelectedBudgetList = currentSelectedBudgetList,
+            genreList = genres.list,
+            budgetList = budgets.list,
+            onDismissRequest = { openDialog = false }
+        ) { checkedGenres, checkedBudgets ->
+            viewModel.searchShopsOnFilterChanged(
+                fetchCount = Pagination.perPageNumber.toString(),
+                genreList = checkedGenres,
+                budgetList = checkedBudgets,
+                onSearchStart = { currentPageNumber = Pagination.defaultPageNumber }
+            )
+        }
+    }
+
     if (isSearching) {
         OnExecutingIndicator(text = stringResource(R.string.on_searching_indicator_message))
     }
 
+}
+
+private fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
 
 private fun loadCurrentLocation(
