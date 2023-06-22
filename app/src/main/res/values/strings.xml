@@ -24,4 +24,8 @@
     <string name="search_filter_dialog_genre_header">ジャンル</string>
     <string name="search_filter_dialog_positive_button">確定</string>
     <string name="search_filter_dialog_negative_button">キャンセル</string>
+    <string name="network_connection_error_dialog_title">ネットワークエラー</string>
+    <string name="network_connection_error_dialog_message">通信エラーが発生しました。しばらく経ってからお試しいただくか、アプリを再起動してください。</string>
+    <string name="error_dialog_title">エラー</string>
+    <string name="error_dialog_message">予期せぬエラーが発生しました。しばらく経ってからお試しいただくか、アプリを再起動してください。</string>
 </resources>

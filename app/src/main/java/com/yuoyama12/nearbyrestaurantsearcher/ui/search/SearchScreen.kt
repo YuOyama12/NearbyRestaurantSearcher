@@ -39,12 +39,11 @@ import com.google.maps.android.compose.*
 import com.yuoyama12.nearbyrestaurantsearcher.Pagination
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
-import com.yuoyama12.nearbyrestaurantsearcher.composable.NoListItemImage
-import com.yuoyama12.nearbyrestaurantsearcher.composable.OnExecutingIndicator
+import com.yuoyama12.nearbyrestaurantsearcher.composable.*
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.PaginationBar
-import com.yuoyama12.nearbyrestaurantsearcher.composable.component.ShopSearcherWithRadius
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RestaurantListItem
-import com.yuoyama12.nearbyrestaurantsearcher.composable.component.SearchFilterDialog
+import com.yuoyama12.nearbyrestaurantsearcher.composable.component.ShopSearcherWithRadius
+import com.yuoyama12.nearbyrestaurantsearcher.isNetworkConnected
 import kotlinx.coroutines.launch
 
 const val PERMISSION_REQUEST_CODE = 1
@@ -55,6 +54,20 @@ fun SearchScreen(
     onItemClicked: (shopId: String) -> Unit
 ) {
     val context = LocalContext.current
+    var isInitializeSuccessful by remember { mutableStateOf(false) }
+
+    if (!isNetworkConnected(context) && !isInitializeSuccessful) {
+        NetworkConnectionErrorDialog (
+            onConfirmClicked = {
+                if (isNetworkConnected(context))
+                    isInitializeSuccessful = true
+            }
+        )
+        return
+    } else {
+        isInitializeSuccessful = true
+    }
+
     val viewModel: SearchViewModel = hiltViewModel()
     val shops by viewModel.shops.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
@@ -69,7 +82,10 @@ fun SearchScreen(
                 CameraPosition.fromLatLngZoom(currentLocation, RadiusForMap.getFloatOfRadius(currentRadius))
         }
 
-    var openDialog by remember { mutableStateOf(false) }
+    var openConnectionErrorDialog by remember { mutableStateOf(false) }
+    var openMiscellaneousErrorDialog by remember { mutableStateOf(false) }
+
+    var openFilterDialog by remember { mutableStateOf(false) }
     val currentSelectedGenreList by viewModel.currentSelectedGenreList.collectAsState()
     val currentSelectedBudgetList by viewModel.currentSelectedBudgetList.collectAsState()
 
@@ -80,7 +96,12 @@ fun SearchScreen(
     val noResultMessage = stringResource(R.string.no_result_message)
 
     LaunchedEffect(Unit) {
-        loadCurrentLocation(context) { latAndLong -> currentLocation = latAndLong }
+        loadCurrentLocation(
+            context = context,
+            onNetworkConnectionFailed = { openConnectionErrorDialog = true },
+            onTaskCompleted = { latAndLong -> currentLocation = latAndLong },
+            onTaskFailed = { openMiscellaneousErrorDialog = true }
+        )
     }
 
     LaunchedEffect(currentRadius) {
@@ -111,13 +132,21 @@ fun SearchScreen(
             onSliderValueChanged = { radius -> currentRadius = radius },
             onSearchClicked = {
                 currentPageNumber = Pagination.defaultPageNumber
-                loadCurrentLocation(context) { latAndLong -> currentLocation = latAndLong }
 
-                viewModel.searchShops(
-                    latitude = currentLocation.latitude.toString(),
-                    longitude = currentLocation.longitude.toString(),
-                    radius = currentRadius,
-                    fetchCount = Pagination.perPageNumber.toString()
+                loadCurrentLocation(
+                    context = context,
+                    onNetworkConnectionFailed = { openConnectionErrorDialog = true },
+                    onTaskCompleted = { latAndLong ->
+                        currentLocation = latAndLong
+
+                        viewModel.searchShops(
+                            latitude = currentLocation.latitude.toString(),
+                            longitude = currentLocation.longitude.toString(),
+                            radius = currentRadius,
+                            fetchCount = Pagination.perPageNumber.toString()
+                        )
+                    },
+                    onTaskFailed = { openMiscellaneousErrorDialog = true }
                 )
             }
         )
@@ -146,7 +175,12 @@ fun SearchScreen(
                 IconButton(
                     modifier = Modifier.align(Alignment.TopEnd),
                     onClick = {
-                        loadCurrentLocation(context) { latAndLong -> currentLocation = latAndLong }
+                        loadCurrentLocation(
+                            context = context,
+                            onNetworkConnectionFailed = { openConnectionErrorDialog = true },
+                            onTaskCompleted = { latAndLong -> currentLocation = latAndLong },
+                            onTaskFailed = { openMiscellaneousErrorDialog = true }
+                        )
                     }
                 ) {
                     Icon(
@@ -168,7 +202,12 @@ fun SearchScreen(
                 IconButton(
                     modifier = Modifier.align(Alignment.TopEnd),
                     onClick = {
-                        loadCurrentLocation(context) { latAndLong -> currentLocation = latAndLong }
+                        loadCurrentLocation(
+                            context = context,
+                            onNetworkConnectionFailed = { openConnectionErrorDialog = true },
+                            onTaskCompleted = { latAndLong -> currentLocation = latAndLong },
+                            onTaskFailed = { openMiscellaneousErrorDialog = true }
+                        )
                     }
                 ) {
                     Icon(
@@ -178,7 +217,7 @@ fun SearchScreen(
                 }
             }
         }
-        
+
         Column {
             Box(
                 modifier = Modifier
@@ -214,7 +253,7 @@ fun SearchScreen(
 
                     TextButton(
                         modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.primary),
-                        onClick =  { openDialog = true },
+                        onClick =  { openFilterDialog = true },
                         shape = RectangleShape,
                         colors = filterButtonColors
                     ) {
@@ -253,7 +292,7 @@ fun SearchScreen(
             }
 
             Divider(modifier = Modifier.shadow(1.dp))
-            
+
             PaginationBar(
                 enabled = (Pagination.getMaxPageCountFrom(shops) != 0),
                 currentPageNumber = currentPageNumber,
@@ -262,6 +301,11 @@ fun SearchScreen(
                 onBackIconClicked = { currentPageNumber-- },
                 onPageNumberSelected = { newPageNum -> currentPageNumber = newPageNum },
                 onPageChanged = {
+                    if (!isNetworkConnected(context)) {
+                        openConnectionErrorDialog = true
+                        return@PaginationBar
+                    }
+
                     viewModel.searchShopsOnPaging(
                         fetchCount = Pagination.perPageNumber.toString(),
                         fetchStartFrom = Pagination.getStartNumber(currentPageNumber).toString()
@@ -273,14 +317,21 @@ fun SearchScreen(
         }
     }
 
-    if (openDialog) {
+    if (openFilterDialog) {
         SearchFilterDialog(
             defaultSelectedGenreList = currentSelectedGenreList,
             defaultSelectedBudgetList = currentSelectedBudgetList,
             genreList = genres.list,
             budgetList = budgets.list,
-            onDismissRequest = { openDialog = false }
+            onDismissRequest = { openFilterDialog = false }
         ) { checkedGenres, checkedBudgets ->
+            if (!isNetworkConnected(context)) {
+                viewModel.storeFilterList(checkedGenres, checkedBudgets)
+                openConnectionErrorDialog = true
+
+                return@SearchFilterDialog
+            }
+
             viewModel.searchShopsOnFilterChanged(
                 fetchCount = Pagination.perPageNumber.toString(),
                 genreList = checkedGenres,
@@ -294,6 +345,21 @@ fun SearchScreen(
         OnExecutingIndicator(text = stringResource(R.string.on_searching_indicator_message))
     }
 
+    if (openMiscellaneousErrorDialog) {
+        ErrorAlertDialog(
+            title = stringResource(R.string.error_dialog_title),
+            message = stringResource(R.string.error_dialog_message),
+            onDismissRequest = { openMiscellaneousErrorDialog = false },
+            onConfirmClicked = { openMiscellaneousErrorDialog = false }
+        )
+    }
+
+    if (openConnectionErrorDialog) {
+        NetworkConnectionErrorDialog(
+            onConfirmClicked = { openConnectionErrorDialog = false }
+        )
+    }
+
 }
 
 private fun showToast(context: Context, message: String) {
@@ -302,8 +368,15 @@ private fun showToast(context: Context, message: String) {
 
 private fun loadCurrentLocation(
     context: Context,
-    onTaskCompleted: (LatLng) -> Unit
+    onNetworkConnectionFailed: () -> Unit,
+    onTaskCompleted: (LatLng) -> Unit,
+    onTaskFailed: () -> Unit
 ) {
+    if (!isNetworkConnected(context)) {
+        onNetworkConnectionFailed()
+        return
+    }
+
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     if (ActivityCompat.checkSelfPermission(
@@ -328,6 +401,14 @@ private fun loadCurrentLocation(
         Priority.PRIORITY_HIGH_ACCURACY,
         CancellationTokenSource().token
     ).addOnSuccessListener { location ->
-        onTaskCompleted(LatLng(location.latitude, location.longitude))
+        onTaskCompleted(
+            try {
+                LatLng(location.latitude, location.longitude)
+            } catch (e :java.lang.NullPointerException) {
+                latLngOfNullIsland
+            }
+        )
+    }.addOnFailureListener {
+        onTaskFailed()
     }
 }

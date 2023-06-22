@@ -2,7 +2,6 @@ package com.yuoyama12.nearbyrestaurantsearcher.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yuoyama12.nearbyrestaurantsearcher.BuildConfig
 import com.yuoyama12.nearbyrestaurantsearcher.DEFAULT_SHOP_ID
 import com.yuoyama12.nearbyrestaurantsearcher.HOT_PEPPER_API_KEY
 import com.yuoyama12.nearbyrestaurantsearcher.data.Shop

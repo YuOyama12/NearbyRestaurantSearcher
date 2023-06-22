@@ -1,4 +1,4 @@
-package com.yuoyama12.nearbyrestaurantsearcher.composable.component
+package com.yuoyama12.nearbyrestaurantsearcher.composable
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.data.Budget
 import com.yuoyama12.nearbyrestaurantsearcher.data.Genre
@@ -248,5 +249,43 @@ private fun <E> GridCheckBoxes(
             }
         }
     }
+}
+
+@Composable
+fun ErrorAlertDialog(
+    title: String,
+    message: String,
+    onDismissRequest: () -> Unit,
+    onConfirmClicked: () -> Unit
+) {
+    AlertDialog(
+        title = { Text(text = title) },
+        text = { Text(text = message) },
+        onDismissRequest = { onDismissRequest() },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirmClicked() }
+            ) {
+                Text(text = stringResource(android.R.string.ok))
+            }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    )
+}
+
+@Composable
+fun NetworkConnectionErrorDialog(
+    onDismissRequest: () -> Unit = {  },
+    onConfirmClicked: () -> Unit
+) {
+    ErrorAlertDialog(
+        title = stringResource(R.string.network_connection_error_dialog_title),
+        message = stringResource(R.string.network_connection_error_dialog_message),
+        onDismissRequest = onDismissRequest,
+        onConfirmClicked = onConfirmClicked
+    )
 }
 

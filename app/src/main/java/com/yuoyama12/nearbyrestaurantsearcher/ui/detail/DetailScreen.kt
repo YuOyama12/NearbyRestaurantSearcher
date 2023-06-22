@@ -8,15 +8,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.ButtonDefaults.buttonElevation
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -27,14 +25,35 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.composable.FilledGenreBox
 import com.yuoyama12.nearbyrestaurantsearcher.composable.FilledRoundCornerShapedBox
+import com.yuoyama12.nearbyrestaurantsearcher.composable.NetworkConnectionErrorDialog
 import com.yuoyama12.nearbyrestaurantsearcher.composable.NetworkImage
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.*
+import com.yuoyama12.nearbyrestaurantsearcher.isNetworkConnected
 
 private val spacerModifier = Modifier.padding(vertical = 3.dp)
 @Composable
 fun DetailScreen(
-    shopId: String
+    shopId: String,
+    onConnectionFailed: () -> Unit
 ) {
+    val context = LocalContext.current
+    var isInitializeSuccessful by remember { mutableStateOf(false) }
+
+    if (!isNetworkConnected(context) && !isInitializeSuccessful) {
+        NetworkConnectionErrorDialog (
+            onConfirmClicked = {
+                if (isNetworkConnected(context)) {
+                    isInitializeSuccessful = true
+                } else {
+                    onConnectionFailed()
+                }
+            }
+        )
+        return
+    } else {
+        isInitializeSuccessful = true
+    }
+
     val uriHandler = LocalUriHandler.current
 
     val viewModel: DetailViewModel = hiltViewModel()

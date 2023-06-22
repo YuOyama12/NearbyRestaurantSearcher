@@ -120,7 +120,6 @@ class SearchViewModel @Inject constructor(
         if (currentSearchInfo.isEmpty()) return
 
         onSearchStart()
-
         viewModelScope.launch {
             _isSearching.value = true
 
@@ -154,7 +153,7 @@ class SearchViewModel @Inject constructor(
         currentSearchInfo.clear()
     }
 
-    private fun storeFilterList(
+    fun storeFilterList(
         genreList: List<Genre>,
         budgetList: List<Budget>
     ) {

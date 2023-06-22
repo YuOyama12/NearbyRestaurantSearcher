@@ -1,5 +1,8 @@
 package com.yuoyama12.nearbyrestaurantsearcher
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -53,12 +56,28 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
                             val shopId = backStackEntry.arguments?.getString(SHOP_ID) ?: DEFAULT_SHOP_ID
 
-                            DetailScreen(shopId = shopId)
+                            DetailScreen(
+                                shopId = shopId,
+                                onConnectionFailed = { navController.popBackStack() }
+                            )
                         }
                     }
                 }
             }
         }
+    }
+}
+
+fun isNetworkConnected(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val activeNetWork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+    return when {
+        activeNetWork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+        activeNetWork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+        activeNetWork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+        else -> false
     }
 }
 
