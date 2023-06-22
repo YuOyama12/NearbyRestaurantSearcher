@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -25,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -75,6 +79,7 @@ fun SearchScreen(
     val genres by viewModel.genres.collectAsState()
     val budgets by viewModel.budgets.collectAsState()
 
+    var showMap by rememberSaveable { mutableStateOf(true) }
     var currentRadius by remember { mutableStateOf(RadiusForMap.Radius.RADIUS_1000M) }
     var currentLocation by remember { mutableStateOf(latLngOfNullIsland) }
     val cameraPositionState = rememberCameraPositionState {
@@ -151,69 +156,71 @@ fun SearchScreen(
             }
         )
 
-        if (currentLocation != latLngOfNullIsland) {
-            Box(
-                modifier = Modifier
-                    .height(mapHeight)
-                    .fillMaxWidth()
-            ) {
-                GoogleMap(
+        AnimatedVisibility(visible = showMap) {
+            if (currentLocation != latLngOfNullIsland) {
+                Box(
                     modifier = Modifier
                         .height(mapHeight)
-                        .fillMaxWidth(),
-                    cameraPositionState = cameraPositionState
+                        .fillMaxWidth()
                 ) {
-                    Marker(state = MarkerState(position = currentLocation))
+                    GoogleMap(
+                        modifier = Modifier
+                            .height(mapHeight)
+                            .fillMaxWidth(),
+                        cameraPositionState = cameraPositionState
+                    ) {
+                        Marker(state = MarkerState(position = currentLocation))
 
-                    Circle(
-                        center = currentLocation,
-                        radius = currentRadius.int.toDouble(),
-                        strokeWidth = 4f
-                    )
-                }
-
-                IconButton(
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    onClick = {
-                        loadCurrentLocation(
-                            context = context,
-                            onNetworkConnectionFailed = { openConnectionErrorDialog = true },
-                            onTaskCompleted = { latAndLong -> currentLocation = latAndLong },
-                            onTaskFailed = { openMiscellaneousErrorDialog = true }
+                        Circle(
+                            center = currentLocation,
+                            radius = currentRadius.int.toDouble(),
+                            strokeWidth = 4f
                         )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = null
-                    )
-                }
-            }
-        } else {
-            Box(
-                modifier = Modifier
-                    .height(mapHeight)
-                    .fillMaxWidth()
-                    .background(Color.LightGray),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = stringResource(R.string.message_when_cannot_fetch_location))
 
-                IconButton(
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    onClick = {
-                        loadCurrentLocation(
-                            context = context,
-                            onNetworkConnectionFailed = { openConnectionErrorDialog = true },
-                            onTaskCompleted = { latAndLong -> currentLocation = latAndLong },
-                            onTaskFailed = { openMiscellaneousErrorDialog = true }
+                    IconButton(
+                        modifier = Modifier.align(Alignment.TopEnd),
+                        onClick = {
+                            loadCurrentLocation(
+                                context = context,
+                                onNetworkConnectionFailed = { openConnectionErrorDialog = true },
+                                onTaskCompleted = { latAndLong -> currentLocation = latAndLong },
+                                onTaskFailed = { openMiscellaneousErrorDialog = true }
+                            )
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null
                         )
                     }
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .height(mapHeight)
+                        .fillMaxWidth()
+                        .background(Color.LightGray),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = null
-                    )
+                    Text(text = stringResource(R.string.message_when_cannot_fetch_location))
+
+                    IconButton(
+                        modifier = Modifier.align(Alignment.TopEnd),
+                        onClick = {
+                            loadCurrentLocation(
+                                context = context,
+                                onNetworkConnectionFailed = { openConnectionErrorDialog = true },
+                                onTaskCompleted = { latAndLong -> currentLocation = latAndLong },
+                                onTaskFailed = { openMiscellaneousErrorDialog = true }
+                            )
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }
@@ -246,7 +253,8 @@ fun SearchScreen(
 
                     Text(
                         text = stringResource(R.string.list_header),
-                        fontSize = 16.sp
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
                     )
 
                     Box(modifier = Modifier.weight(1f))
@@ -262,6 +270,23 @@ fun SearchScreen(
 
                             Icon(
                                 imageVector = Icons.Default.Settings,
+                                contentDescription = null
+                            )
+                        }
+                    }
+
+                    IconToggleButton(
+                        checked = showMap,
+                        onCheckedChange = { showMap = !showMap }
+                    ) {
+                        if (showMap) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowUp,
+                                contentDescription = null
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
                                 contentDescription = null
                             )
                         }
