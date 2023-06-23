@@ -30,6 +30,7 @@ import com.yuoyama12.nearbyrestaurantsearcher.data.Shop
 
 private val shopNameFontSize = 20.sp
 private val subTextFontSize = 10.sp
+private const val TEXT_WHEN_NO_INFO = " ― "
 @Composable
 fun RestaurantListItem(
     modifier: Modifier = Modifier,
@@ -135,7 +136,7 @@ fun RestaurantListItem(
 
                         Text(
                             modifier = Modifier.padding(start = 3.dp),
-                            text = shop.budget.name,
+                            text = shop.budget.name.ifEmpty { TEXT_WHEN_NO_INFO },
                             fontSize = subTextFontSize
                         )
                     }

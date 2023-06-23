@@ -49,7 +49,6 @@ import com.yuoyama12.nearbyrestaurantsearcher.isNetworkConnected
 import kotlinx.coroutines.launch
 
 const val PERMISSION_REQUEST_CODE = 1
-private val mapHeight = 255.dp
 val latLngOfNullIsland = LatLng(0.0, 0.0)
 @Composable
 fun SearchScreen(
@@ -153,17 +152,14 @@ fun SearchScreen(
             }
         )
 
-        AnimatedVisibility(visible = showMap) {
+        AnimatedVisibility(
+            modifier = Modifier.weight(0.4f),
+            visible = showMap
+        ) {
             if (currentLocation != latLngOfNullIsland) {
-                Box(
-                    modifier = Modifier
-                        .height(mapHeight)
-                        .fillMaxWidth()
-                ) {
+                Box {
                     GoogleMap(
-                        modifier = Modifier
-                            .height(mapHeight)
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxSize(),
                         cameraPositionState = cameraPositionState
                     ) {
                         Marker(
@@ -220,12 +216,14 @@ fun SearchScreen(
             } else {
                 Box(
                     modifier = Modifier
-                        .height(mapHeight)
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .background(Color.LightGray),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = stringResource(R.string.message_when_cannot_fetch_location))
+                    Text(
+                        text = stringResource(R.string.message_when_cannot_fetch_location),
+                        fontSize = 14.sp
+                    )
 
                     IconButton(
                         modifier = Modifier.align(Alignment.TopEnd),
@@ -247,7 +245,7 @@ fun SearchScreen(
             }
         }
 
-        Column {
+        Column(modifier = Modifier.weight(0.6f)) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -452,8 +450,12 @@ private suspend fun resetMapCameraPosition(
     currentLocation: LatLng,
     currentRadius: RadiusForMap.Radius,
     ) {
-    val cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(currentLocation, RadiusForMap.getFloatOfRadius(currentRadius))
-    cameraPositionState.animate(cameraUpdateFactory)
+    try {
+        val cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(currentLocation, RadiusForMap.getFloatOfRadius(currentRadius))
+        cameraPositionState.animate(cameraUpdateFactory)
+    } catch (e: java.lang.NullPointerException) {
+        return
+    }
 }
 
 private suspend fun moveMapCameraToSelectedPosition(

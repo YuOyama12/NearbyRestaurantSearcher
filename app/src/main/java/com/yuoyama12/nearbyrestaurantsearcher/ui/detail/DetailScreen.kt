@@ -143,7 +143,7 @@ fun DetailScreen(
         ) {
             Text(
                 text = stringResource(R.string.move_to_hot_pepper_button_text),
-                fontSize = detailHeaderFontSize
+                fontSize = 16.sp
             )
         }
 
