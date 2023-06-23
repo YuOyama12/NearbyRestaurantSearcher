@@ -4,7 +4,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yuoyama12.nearbyrestaurantsearcher.HOT_PEPPER_API_KEY
+import com.yuoyama12.nearbyrestaurantsearcher.BuildConfig
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
 import com.yuoyama12.nearbyrestaurantsearcher.data.*
 import com.yuoyama12.nearbyrestaurantsearcher.network.budget.HotPepperBudgetService
@@ -45,8 +45,8 @@ class SearchViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _genres.value = genreService.fetchGenres(HOT_PEPPER_API_KEY)
-            _budgets.value = budgetService.fetchBudgets(HOT_PEPPER_API_KEY)
+            _genres.value = genreService.fetchGenres(BuildConfig.API_KEY)
+            _budgets.value = budgetService.fetchBudgets(BuildConfig.API_KEY)
         }
     }
 
@@ -68,7 +68,7 @@ class SearchViewModel @Inject constructor(
             _isSearching.value = true
 
             val shops = searchService.fetchShops(
-                key = HOT_PEPPER_API_KEY,
+                key = BuildConfig.API_KEY,
                 latitude = latitude,
                 longitude = longitude,
                 range = range,
@@ -97,7 +97,7 @@ class SearchViewModel @Inject constructor(
             _isSearching.value = true
 
             val shops = searchService.fetchShops(
-                key = HOT_PEPPER_API_KEY,
+                key = BuildConfig.API_KEY,
                 latitude = currentSearchInfo["latitude"]!!,
                 longitude = currentSearchInfo["longitude"]!!,
                 range = currentSearchInfo["range"]!!,
@@ -129,7 +129,7 @@ class SearchViewModel @Inject constructor(
             _isSearching.value = true
 
             val shops = searchService.fetchShops(
-                key = HOT_PEPPER_API_KEY,
+                key = BuildConfig.API_KEY,
                 latitude = currentSearchInfo["latitude"]!!,
                 longitude = currentSearchInfo["longitude"]!!,
                 range = currentSearchInfo["range"]!!,

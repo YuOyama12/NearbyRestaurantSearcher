@@ -333,7 +333,11 @@ fun SearchScreen(
                             RestaurantListItem(
                                 shop = shop,
                                 onItemClicked = {
-                                    if (!showMap || (selectedShopOnMap.id == shop.id)) {
+                                    if (
+                                        !showMap
+                                        || selectedShopOnMap.id == shop.id
+                                        || currentLocation == latLngOfNullIsland
+                                    ) {
                                         navigateToDetail(shop.id)
                                         return@RestaurantListItem
                                     }
