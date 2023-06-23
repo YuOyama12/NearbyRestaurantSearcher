@@ -6,9 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -44,9 +43,8 @@ import com.yuoyama12.nearbyrestaurantsearcher.Pagination
 import com.yuoyama12.nearbyrestaurantsearcher.R
 import com.yuoyama12.nearbyrestaurantsearcher.RadiusForMap
 import com.yuoyama12.nearbyrestaurantsearcher.composable.*
-import com.yuoyama12.nearbyrestaurantsearcher.composable.component.PaginationBar
-import com.yuoyama12.nearbyrestaurantsearcher.composable.component.RestaurantListItem
-import com.yuoyama12.nearbyrestaurantsearcher.composable.component.ShopSearcherWithRadius
+import com.yuoyama12.nearbyrestaurantsearcher.composable.component.*
+import com.yuoyama12.nearbyrestaurantsearcher.data.Shop
 import com.yuoyama12.nearbyrestaurantsearcher.isNetworkConnected
 import kotlinx.coroutines.launch
 
@@ -55,7 +53,7 @@ private val mapHeight = 255.dp
 val latLngOfNullIsland = LatLng(0.0, 0.0)
 @Composable
 fun SearchScreen(
-    onItemClicked: (shopId: String) -> Unit
+    navigateToDetail: (shopId: String) -> Unit
 ) {
     val context = LocalContext.current
     var isInitializeSuccessful by remember { mutableStateOf(false) }
@@ -80,12 +78,13 @@ fun SearchScreen(
     val budgets by viewModel.budgets.collectAsState()
 
     var showMap by rememberSaveable { mutableStateOf(true) }
-    var currentRadius by remember { mutableStateOf(RadiusForMap.Radius.RADIUS_1000M) }
+    var currentRadius by rememberSaveable { mutableStateOf(RadiusForMap.Radius.RADIUS_1000M) }
     var currentLocation by remember { mutableStateOf(latLngOfNullIsland) }
     val cameraPositionState = rememberCameraPositionState {
             position =
                 CameraPosition.fromLatLngZoom(currentLocation, RadiusForMap.getFloatOfRadius(currentRadius))
         }
+    var selectedShopOnMap by remember { mutableStateOf(Shop()) }
 
     var openConnectionErrorDialog by remember { mutableStateOf(false) }
     var openMiscellaneousErrorDialog by remember { mutableStateOf(false) }
@@ -99,6 +98,7 @@ fun SearchScreen(
     val lazyListState = rememberLazyListState()
 
     val noResultMessage = stringResource(R.string.no_result_message)
+    val latLngErrorMessage = stringResource(R.string.lat_lng_error_message)
 
     LaunchedEffect(Unit) {
         loadCurrentLocation(
@@ -110,23 +110,16 @@ fun SearchScreen(
     }
 
     LaunchedEffect(currentRadius) {
-        val cameraUpdateFactory =
-            CameraUpdateFactory.zoomTo(RadiusForMap.getFloatOfRadius(currentRadius))
-
-        cameraPositionState.animate(cameraUpdateFactory)
+        resetMapCameraPosition(cameraPositionState, currentLocation, currentRadius)
     }
 
     LaunchedEffect(currentLocation) {
-        val cameraUpdateFactory =
-            CameraUpdateFactory.newLatLngZoom(
-                currentLocation,
-                RadiusForMap.getFloatOfRadius(currentRadius)
-            )
-
-        cameraPositionState.animate(cameraUpdateFactory)
+        resetMapCameraPosition(cameraPositionState, currentLocation, currentRadius)
     }
 
     LaunchedEffect(shops) {
+        selectedShopOnMap = Shop()
+
         if (shops.hasResult == false) {
             showToast(context, noResultMessage)
         }
@@ -136,6 +129,10 @@ fun SearchScreen(
         ShopSearcherWithRadius (
             onSliderValueChanged = { radius -> currentRadius = radius },
             onSearchClicked = {
+                composableScope.launch {
+                    resetMapCameraPosition(cameraPositionState, currentLocation, currentRadius)
+                }
+
                 currentPageNumber = Pagination.defaultPageNumber
 
                 loadCurrentLocation(
@@ -169,13 +166,38 @@ fun SearchScreen(
                             .fillMaxWidth(),
                         cameraPositionState = cameraPositionState
                     ) {
-                        Marker(state = MarkerState(position = currentLocation))
+                        Marker(
+                            state = MarkerState(position = currentLocation),
+                            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+                        )
 
                         Circle(
                             center = currentLocation,
                             radius = currentRadius.int.toDouble(),
-                            strokeWidth = 4f
+                            strokeWidth = 4f,
+                            strokeColor = MaterialTheme.colorScheme.secondary,
+                            fillColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
                         )
+
+                        shops.list.forEach { shop ->
+                            val shopLatLng: LatLng
+
+                            try {
+                                shopLatLng =
+                                    LatLng(shop.latitude.toDouble(), shop.longitude.toDouble())
+                            } catch (e :NumberFormatException) {
+                                showToast(context, latLngErrorMessage)
+                                return@GoogleMap
+                            }
+
+                            RestaurantMarker(
+                                latLng = shopLatLng,
+                                shop = shop
+                            ) { _shop, markerState ->
+                                if (_shop.id == selectedShopOnMap.id) { markerState.showInfoWindow() }
+                                else { markerState.hideInfoWindow() }
+                            }
+                        }
                     }
 
                     IconButton(
@@ -306,10 +328,32 @@ fun SearchScreen(
                     state = lazyListState
                 ) {
                     items(shops.list) { shop ->
-                        Column(
-                            modifier = Modifier.clickable { onItemClicked(shop.id) }
-                        ) {
-                            RestaurantListItem(shop = shop)
+                        Column {
+                            RestaurantListItem(
+                                shop = shop,
+                                onItemClicked = {
+                                    if (!showMap || (selectedShopOnMap.id == shop.id)) {
+                                        navigateToDetail(shop.id)
+                                        return@RestaurantListItem
+                                    }
+
+                                    try {
+                                        val selectedShopLocation =
+                                            LatLng(shop.latitude.toDouble(), shop.longitude.toDouble())
+
+                                        selectedShopOnMap = shop
+
+                                        composableScope.launch {
+                                            moveMapCameraToSelectedPosition(cameraPositionState, selectedShopLocation)
+                                        }
+                                    } catch (e: NumberFormatException) {
+                                        navigateToDetail(shop.id)
+                                        return@RestaurantListItem
+                                    }
+                                },
+                                onMenuItemClicked = { navigateToDetail(shop.id) }
+                            )
+
                             Divider()
                         }
                     }
@@ -389,6 +433,23 @@ fun SearchScreen(
 
 private fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
+
+private suspend fun resetMapCameraPosition(
+    cameraPositionState: CameraPositionState,
+    currentLocation: LatLng,
+    currentRadius: RadiusForMap.Radius,
+    ) {
+    val cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(currentLocation, RadiusForMap.getFloatOfRadius(currentRadius))
+    cameraPositionState.animate(cameraUpdateFactory)
+}
+
+private suspend fun moveMapCameraToSelectedPosition(
+    cameraPositionState: CameraPositionState,
+    selectedPosition: LatLng
+) {
+    val cameraUpdateFactory = CameraUpdateFactory.newLatLngZoom(selectedPosition, 15.5f)
+    cameraPositionState.animate(cameraUpdateFactory)
 }
 
 private fun loadCurrentLocation(

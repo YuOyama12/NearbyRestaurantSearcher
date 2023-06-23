@@ -85,6 +85,6 @@ fun isNetworkConnected(context: Context): Boolean {
 @Composable
 fun DefaultPreview() {
     NearbyRestaurantSearcherTheme {
-        SearchScreen(onItemClicked = {  })
+        SearchScreen(navigateToDetail = {  })
     }
 }
