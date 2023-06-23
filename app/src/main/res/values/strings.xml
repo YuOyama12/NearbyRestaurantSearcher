@@ -31,4 +31,6 @@
     <string name="network_connection_error_dialog_message">通信エラーが発生しました。しばらく経ってからお試しいただくか、アプリを再起動してください。</string>
     <string name="error_dialog_title">エラー</string>
     <string name="error_dialog_message">予期せぬエラーが発生しました。しばらく経ってからお試しいただくか、アプリを再起動してください。</string>
+    <string name="hot_pepper_credit_header">Powered by</string>
+    <string name="hot_pepper_credit_body">ホットペッパー Webサービス</string>
 </resources>

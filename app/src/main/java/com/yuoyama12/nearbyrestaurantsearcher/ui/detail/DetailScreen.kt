@@ -191,6 +191,18 @@ fun DetailScreen(
             headerText = stringResource(R.string.list_item_budget_header),
             bodyText = shop.budget.name
         )
+
+
+        Divider(
+            modifier = Modifier.padding(all = 6.dp),
+            thickness = 2.dp
+        )
+
+        Credit(
+            modifier = Modifier
+                .padding(vertical = 12.dp, horizontal = 10.dp)
+                .align(Alignment.End)
+        )
     }
 
 }
