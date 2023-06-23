@@ -12,6 +12,7 @@
     <string name="list_filter_button_text">検索条件設定</string>
     <string name="list_item_budget_header">予算</string>
     <string name="max_page_count_header_for_pagination">of</string>
+    <string name="per_page_header_for_pagination">1ページ\n表示件数：</string>
     <string name="list_item_menu_navigate_to_detail">詳細な情報を確認</string>
     <string name="detail_screen_shop_info_header">レストラン情報</string>
     <string name="move_to_hot_pepper_button_text">ホットペッパーのページに移動</string>

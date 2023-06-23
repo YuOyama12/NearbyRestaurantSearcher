@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.yuoyama12.nearbyrestaurantsearcher.Pagination.perPageNumberList
 import com.yuoyama12.nearbyrestaurantsearcher.R
 
 private val fontSize = 12.sp
@@ -26,12 +27,15 @@ fun PaginationBar(
     enabled: Boolean = true,
     currentPageNumber: Int,
     maxPageCount: Int,
+    perPageNumber: Int,
     onForwardIconClicked: () -> Unit,
     onBackIconClicked: () -> Unit,
     onPageNumberSelected: (Int) -> Unit,
-    onPageChanged: () -> Unit
+    onPerPageNumberSelected: (Int) -> Unit,
+    onPageContentChanged: () -> Unit
 ) {
     var pageNumberOptionExpanded by remember { mutableStateOf(false)}
+    var perPageOptionExpanded by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier.padding(vertical = 2.dp),
@@ -42,7 +46,7 @@ fun PaginationBar(
             onClick = {
                 if (1 < currentPageNumber) {
                     onBackIconClicked()
-                    onPageChanged()
+                    onPageContentChanged()
                 }
             },
             enabled = enabled
@@ -88,7 +92,7 @@ fun PaginationBar(
                         onClick = {
                             if (currentPageNumber != i) {
                                 onPageNumberSelected(i)
-                                onPageChanged()
+                                onPageContentChanged()
                             }
                             pageNumberOptionExpanded = false
                         },
@@ -119,7 +123,7 @@ fun PaginationBar(
             onClick = {
                 if (currentPageNumber < maxPageCount) {
                     onForwardIconClicked()
-                    onPageChanged()
+                    onPageContentChanged()
                 }
             },
             enabled = enabled
@@ -128,6 +132,54 @@ fun PaginationBar(
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = null
             )
+        }
+
+
+        Text(
+            text = stringResource(R.string.per_page_header_for_pagination),
+            modifier = Modifier.padding(start = 4.dp, end = 12.dp),
+            fontSize = fontSize
+        )
+
+        TextButton(
+            onClick = { perPageOptionExpanded = !perPageOptionExpanded },
+            modifier = Modifier.border(BorderStroke(0.6.dp, MaterialTheme.colorScheme.primary))
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.requiredWidthIn(min = requiredMinWidthOfText),
+                    text = perPageNumber.toString(),
+                    textAlign = TextAlign.End,
+                    maxLines = 1
+                )
+
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null
+                )
+            }
+
+            DropdownMenu(
+                expanded = perPageOptionExpanded,
+                onDismissRequest = { perPageOptionExpanded = false }
+            ) {
+                for (i in perPageNumberList) {
+                    DropdownMenuItem(
+                        text = { Text(text = i.toString()) },
+                        onClick = {
+                            if (perPageNumber != i) {
+                                onPerPageNumberSelected(i)
+                                onPageContentChanged()
+                            }
+                            perPageOptionExpanded = false
+                        }
+                    )
+
+                    Divider()
+                }
+            }
         }
     }
 

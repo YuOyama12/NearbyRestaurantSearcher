@@ -94,6 +94,7 @@ fun SearchScreen(
     val currentSelectedBudgetList by viewModel.currentSelectedBudgetList.collectAsState()
 
     var currentPageNumber by rememberSaveable { mutableStateOf(Pagination.defaultPageNumber) }
+    var currentPerPageNumber by rememberSaveable { mutableStateOf(Pagination.defaultPerPageNumber) }
     val composableScope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
 
@@ -109,11 +110,7 @@ fun SearchScreen(
         )
     }
 
-    LaunchedEffect(currentRadius) {
-        resetMapCameraPosition(cameraPositionState, currentLocation, currentRadius)
-    }
-
-    LaunchedEffect(currentLocation) {
+    LaunchedEffect(currentRadius, currentLocation) {
         resetMapCameraPosition(cameraPositionState, currentLocation, currentRadius)
     }
 
@@ -145,7 +142,10 @@ fun SearchScreen(
                             latitude = currentLocation.latitude.toString(),
                             longitude = currentLocation.longitude.toString(),
                             radius = currentRadius,
-                            fetchCount = Pagination.perPageNumber.toString()
+                            fetchCount = currentPerPageNumber.toString(),
+                            onSearchCompleted = {
+                                composableScope.launch { lazyListState.scrollToItem(0) }
+                            }
                         )
                     },
                     onTaskFailed = { openMiscellaneousErrorDialog = true }
@@ -327,7 +327,10 @@ fun SearchScreen(
                     modifier = Modifier.weight(1f),
                     state = lazyListState
                 ) {
-                    items(shops.list) { shop ->
+                    items(
+                        items = shops.list,
+                        key = { shop -> shop.id }
+                    ) { shop ->
                         Column {
                             RestaurantListItem(
                                 shop = shop,
@@ -363,24 +366,30 @@ fun SearchScreen(
             Divider(modifier = Modifier.shadow(1.dp))
 
             PaginationBar(
-                enabled = (Pagination.getMaxPageCountFrom(shops) != 0),
+                enabled = (Pagination.getMaxPageCountFrom(shops, currentPerPageNumber) != 0),
                 currentPageNumber = currentPageNumber,
-                maxPageCount = Pagination.getMaxPageCountFrom(shops),
+                maxPageCount = Pagination.getMaxPageCountFrom(shops, currentPerPageNumber),
+                perPageNumber = currentPerPageNumber,
                 onForwardIconClicked = { currentPageNumber++ },
                 onBackIconClicked = { currentPageNumber-- },
                 onPageNumberSelected = { newPageNum -> currentPageNumber = newPageNum },
-                onPageChanged = {
+                onPerPageNumberSelected = { newPerPageNum ->
+                    currentPerPageNumber = newPerPageNum
+                    currentPageNumber = Pagination.defaultPageNumber
+                },
+                onPageContentChanged = {
                     if (!isNetworkConnected(context)) {
                         openConnectionErrorDialog = true
                         return@PaginationBar
                     }
 
                     viewModel.searchShopsOnPaging(
-                        fetchCount = Pagination.perPageNumber.toString(),
-                        fetchStartFrom = Pagination.getStartNumber(currentPageNumber).toString()
+                        fetchCount = currentPerPageNumber.toString(),
+                        fetchStartFrom = Pagination.getStartNumber(currentPageNumber, currentPerPageNumber).toString(),
+                        onSearchCompleted = {
+                            composableScope.launch { lazyListState.scrollToItem(0) }
+                        }
                     )
-
-                    composableScope.launch { lazyListState.scrollToItem(0) }
                 }
             )
         }
@@ -402,10 +411,13 @@ fun SearchScreen(
             }
 
             viewModel.searchShopsOnFilterChanged(
-                fetchCount = Pagination.perPageNumber.toString(),
+                fetchCount = currentPerPageNumber.toString(),
                 genreList = checkedGenres,
                 budgetList = checkedBudgets,
-                onSearchStart = { currentPageNumber = Pagination.defaultPageNumber }
+                onSearchStart = { currentPageNumber = Pagination.defaultPageNumber },
+                onSearchCompleted = {
+                    composableScope.launch { lazyListState.scrollToItem(0) }
+                }
             )
         }
     }

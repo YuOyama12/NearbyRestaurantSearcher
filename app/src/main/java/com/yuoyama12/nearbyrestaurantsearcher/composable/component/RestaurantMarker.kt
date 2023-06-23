@@ -16,7 +16,7 @@ fun RestaurantMarker(
 ) {
     val markerState = rememberMarkerState(null, latLng)
 
-    LaunchedEffect(latLng) { markerState.position = latLng }
+    LaunchedEffect(shop) { markerState.position = latLng }
 
     Marker(
         state = markerState,

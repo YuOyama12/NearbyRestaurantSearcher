@@ -54,7 +54,8 @@ class SearchViewModel @Inject constructor(
         latitude: String,
         longitude: String,
         radius: RadiusForMap.Radius,
-        fetchCount: String
+        fetchCount: String,
+        onSearchCompleted: () -> Unit
     ) {
         resetCurrentSearchInfo()
 
@@ -79,6 +80,7 @@ class SearchViewModel @Inject constructor(
 
             _isSearching.value = false
             _shops.value = shops
+            onSearchCompleted()
         }
 
         storeSearchInfo(latitude, longitude, range)
@@ -86,7 +88,8 @@ class SearchViewModel @Inject constructor(
 
     fun searchShopsOnPaging(
         fetchCount: String,
-        fetchStartFrom: String
+        fetchStartFrom: String,
+        onSearchCompleted: () -> Unit
     ) {
         if (currentSearchInfo.isEmpty()) return
 
@@ -106,6 +109,7 @@ class SearchViewModel @Inject constructor(
 
             _isSearching.value = false
             _shops.value = shops
+            onSearchCompleted()
         }
     }
 
@@ -113,7 +117,8 @@ class SearchViewModel @Inject constructor(
         fetchCount: String,
         genreList: List<Genre>,
         budgetList: List<Budget>,
-        onSearchStart: () -> Unit
+        onSearchStart: () -> Unit,
+        onSearchCompleted: () -> Unit
     ) {
         storeFilterList(genreList, budgetList)
 
@@ -136,6 +141,7 @@ class SearchViewModel @Inject constructor(
 
             _isSearching.value = false
             _shops.value = shops
+            onSearchCompleted()
         }
     }
 
