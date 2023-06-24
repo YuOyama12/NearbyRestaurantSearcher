@@ -22,7 +22,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,6 +45,9 @@ import com.yuoyama12.nearbyrestaurantsearcher.composable.*
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.*
 import com.yuoyama12.nearbyrestaurantsearcher.data.Shop
 import com.yuoyama12.nearbyrestaurantsearcher.isNetworkConnected
+import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.PurpleGrey40
+import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.grayColor
+import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.noMapBoxBackgroundColor
 import kotlinx.coroutines.launch
 
 const val PERMISSION_REQUEST_CODE = 1
@@ -171,8 +173,8 @@ fun SearchScreen(
                             center = currentLocation,
                             radius = currentRadius.int.toDouble(),
                             strokeWidth = 4f,
-                            strokeColor = MaterialTheme.colorScheme.secondary,
-                            fillColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+                            strokeColor = PurpleGrey40,
+                            fillColor = PurpleGrey40.copy(alpha = 0.15f)
                         )
 
                         shops.list.forEach { shop ->
@@ -217,7 +219,7 @@ fun SearchScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.LightGray),
+                        .background(noMapBoxBackgroundColor()),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -252,7 +254,7 @@ fun SearchScreen(
                     .wrapContentHeight()
                     .border(
                         1.dp,
-                        MaterialTheme.colorScheme.secondary,
+                        grayColor(),
                         RectangleShape
                     )
                     .shadow(2.dp, RectangleShape)
@@ -265,7 +267,7 @@ fun SearchScreen(
                         if (currentSelectedGenreList.isNotEmpty()
                             || currentSelectedBudgetList.isNotEmpty()) {
                             ButtonDefaults.textButtonColors(
-                                containerColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.25f),
+                                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
                             )
                         } else {
                             ButtonDefaults.textButtonColors()

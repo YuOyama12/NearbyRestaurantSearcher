@@ -29,6 +29,7 @@ import com.yuoyama12.nearbyrestaurantsearcher.composable.NetworkConnectionErrorD
 import com.yuoyama12.nearbyrestaurantsearcher.composable.NetworkImage
 import com.yuoyama12.nearbyrestaurantsearcher.composable.component.*
 import com.yuoyama12.nearbyrestaurantsearcher.isNetworkConnected
+import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.textColorInFilledColoredBox
 
 private val spacerModifier = Modifier.padding(vertical = 3.dp)
 @Composable
@@ -77,7 +78,7 @@ fun DetailScreen(
             Text(
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
                 text = stringResource(R.string.detail_screen_shop_info_header),
-                color = Color.White,
+                color = textColorInFilledColoredBox(),
                 fontWeight = FontWeight.Bold,
                 fontSize = detailHeaderFontSize
             )

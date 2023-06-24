@@ -6,11 +6,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yuoyama12.nearbyrestaurantsearcher.composable.FilledRoundCornerShapedBox
+import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.textColorInFilledColoredBox
 
 val detailHeaderFontSize = 20.sp
 val detailBodyFontSize = 20.sp
@@ -35,7 +35,7 @@ fun HeaderForDetail(
         Text(
             modifier = Modifier.padding(vertical = 3.dp, horizontal = 15.dp),
             text = text,
-            color = Color.White,
+            color = textColorInFilledColoredBox(),
             fontWeight = FontWeight.Bold,
             fontSize = detailHeaderFontSize
         )

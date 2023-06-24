@@ -27,6 +27,7 @@ import com.yuoyama12.nearbyrestaurantsearcher.composable.FilledGenreBox
 import com.yuoyama12.nearbyrestaurantsearcher.composable.NetworkImage
 import com.yuoyama12.nearbyrestaurantsearcher.data.DropdownItem
 import com.yuoyama12.nearbyrestaurantsearcher.data.Shop
+import com.yuoyama12.nearbyrestaurantsearcher.ui.theme.grayColor
 
 private val shopNameFontSize = 20.sp
 private val subTextFontSize = 10.sp
@@ -126,7 +127,7 @@ fun RestaurantListItem(
                         Text(
                             modifier = Modifier
                                 .border(
-                                    BorderStroke(1.2.dp, MaterialTheme.colorScheme.secondary),
+                                    BorderStroke(1.2.dp, grayColor()),
                                     RectangleShape
                                 )
                                 .padding(horizontal = 2.dp),
