@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(Screen.Search.route) { backStackEntry ->
                             SearchScreen { shopId ->
-                                if (backStackEntry.lifecycle.currentState == Lifecycle.State.RESUMED)
+                                if (backStackEntry.getLifecycle().currentState == Lifecycle.State.RESUMED)
                                     navController.navigate(Screen.Detail.createRouteWithShopId(shopId)) {
                                         launchSingleTop = true
                                     }

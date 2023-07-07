@@ -2,7 +2,6 @@ package com.yuoyama12.nearbyrestaurantsearcher.ui.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yuoyama12.nearbyrestaurantsearcher.BuildConfig
 import com.yuoyama12.nearbyrestaurantsearcher.DEFAULT_SHOP_ID
 import com.yuoyama12.nearbyrestaurantsearcher.data.Shop
 import com.yuoyama12.nearbyrestaurantsearcher.network.gourmet.HotPepperGourmetSearchService
@@ -23,10 +22,7 @@ class DetailViewModel @Inject constructor(
     fun fetchShopById(shopId: String) {
         if (shopId != DEFAULT_SHOP_ID) {
             viewModelScope.launch {
-                val shops = service.fetchShopById(
-                    key = BuildConfig.API_KEY,
-                    shopId = shopId
-                )
+                val shops = service.fetchShopById(shopId = shopId)
                 _shop.value = shops.list[0]
             }
         } else {

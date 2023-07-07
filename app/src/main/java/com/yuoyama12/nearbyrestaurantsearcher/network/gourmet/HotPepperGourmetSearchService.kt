@@ -1,5 +1,6 @@
 package com.yuoyama12.nearbyrestaurantsearcher.network.gourmet
 
+import com.yuoyama12.nearbyrestaurantsearcher.BuildConfig
 import com.yuoyama12.nearbyrestaurantsearcher.data.Shops
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -7,7 +8,7 @@ import retrofit2.http.Query
 interface HotPepperGourmetSearchService {
     @GET("gourmet/v1")
     suspend fun fetchShops(
-        @Query("key") key: String,
+        @Query("key") key: String = BuildConfig.API_KEY,
         @Query("lat") latitude: String,
         @Query("lng") longitude: String,
         @Query("range") range: String,
@@ -19,7 +20,7 @@ interface HotPepperGourmetSearchService {
 
     @GET("gourmet/v1")
     suspend fun fetchShopById(
-        @Query("key") key: String,
+        @Query("key") key: String = BuildConfig.API_KEY,
         @Query("id") shopId: String,
     ): Shops
 }
